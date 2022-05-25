@@ -3,14 +3,14 @@ import { Request, Response } from "express";
 
 const baseUrl = "http://localhost:8090/";
 
-async function fetchWithTimeout(resource, options) {
+async function fetchSetTime(url: string, options: {timeout: number}) {
     const { timeout } = options;
     
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), timeout);
-    const response = await fetch(resource, {
+    const abortcontroller = new AbortController();
+    const id = setTimeout(() => abortcontroller.abort(), timeout);
+    const response = await fetch(url, {
       ...options,
-      signal: controller.signal  
+      signal: abortcontroller.signal  
     });
     clearTimeout(id);
     return response;
@@ -62,7 +62,7 @@ async function getNumbers(req: Request, res: Response) {
   }
   const finalArr = []
   for(var i = 0; i<urlList2.length;i++) {
-      const numbers = await (await fetchWithTimeout(urlList2[i],{timeout: 500})).json() as {numbers: number[]}
+      const numbers = await (await fetchSetTime(urlList2[i],{timeout: 500})).json() as {numbers: number[]}
       for (var j= 0; j<numbers.numbers.length; j++) {
           finalArr.push(numbers.numbers[j])
       }
